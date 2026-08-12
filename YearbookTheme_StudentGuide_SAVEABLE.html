@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yearbook Theme Development Guide — Fillable</title>
+<link href="https://fonts.googleapis.com/css2?family=Permanent+Marker&family=Space+Mono:wght@400;700&family=Archivo:wght@400;500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--char:#2C2C2A;--cream:#F5EFDC;--green:#3B6D11;--gold:#EF9F27;--teal:#1D9E75;--paper:#FBF8EF;--rule:#ddd5bf;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  html{width:8.5in; max-width:8.5in; margin:0 auto;} body{width:100%;}
+  body{font-family:'Archivo',sans-serif;background:var(--paper);color:var(--char);font-size:9.5pt;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact;}
+
+  /* ---- HEADER ---- */
+  header{background:var(--green);padding:0.2in 0.45in;display:flex;align-items:center;justify-content:space-between;}
+  .h-label{background:var(--cream);border-radius:6px;padding:6px 18px 9px;text-align:center;}
+  .h-label .marker{font-family:'Permanent Marker',cursive;font-size:20pt;color:var(--char);line-height:1.1;}
+  .h-label .sub{font-family:'Space Mono',monospace;font-size:6.5pt;color:var(--green);letter-spacing:0.5px;margin-top:2px;}
+  .h-right{text-align:right;color:var(--cream);font-family:'Space Mono',monospace;font-size:7.5pt;line-height:1.7;}
+  .h-right b{color:var(--gold);font-size:9pt;}
+  .stripebar{display:flex;height:0.09in;}
+  .stripebar div{flex:1;}
+
+  /* ---- BODY ---- */
+  .wrap{padding:0.24in 0.45in 0.36in;}
+
+  /* Intro banner */
+  .intro{background:var(--char);border-radius:10px;padding:14px 18px;margin-bottom:0.2in;display:flex;gap:16px;align-items:center;}
+  .intro .marker{font-family:'Permanent Marker',cursive;font-size:28pt;color:var(--gold);line-height:1;flex-shrink:0;}
+  .intro p{font-size:10pt;color:var(--cream);line-height:1.55;}
+  .intro em{color:var(--gold);}
+
+  /* Section headings */
+  .section-head{display:flex;align-items:center;gap:10px;margin:0.22in 0 0.12in;}
+  .section-head .step{background:var(--green);color:#fff;font-family:'Permanent Marker',cursive;font-size:18pt;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .section-head h2{font-family:'Archivo',sans-serif;font-weight:800;font-size:13pt;color:var(--char);}
+  .section-head .tag{font-family:'Space Mono',monospace;font-size:7pt;color:var(--teal);letter-spacing:1px;margin-left:6px;background:#EAF5F2;border-radius:3px;padding:2px 7px;}
+
+  p{margin-bottom:8px;max-width:7.2in;}
+  ul{margin:0 0 10px 1.1em;}
+  li{margin-bottom:5px;}
+  b{color:var(--char);}
+
+  /* Cards */
+  .cards{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:0.14in;}
+  .card{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:10px 12px;}
+  .card .label{font-family:'Space Mono',monospace;font-size:7pt;letter-spacing:1px;color:var(--gold);margin-bottom:4px;}
+  .card b{font-size:9.5pt;display:block;margin-bottom:3px;}
+  .card p{font-size:8.5pt;color:#444;margin:0;}
+
+  /* Test grid */
+  .tests{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:0.14in;}
+  .test{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:9px 12px;display:flex;gap:9px;}
+  .test .icon{font-size:18pt;flex-shrink:0;line-height:1;}
+  .test b{font-size:9pt;display:block;margin-bottom:2px;}
+  .test p{font-size:8.3pt;color:#444;margin:0;}
+
+  /* Canva box */
+  .canva{background:#fff;border:2px solid var(--green);border-radius:10px;padding:12px 16px;margin-bottom:0.14in;}
+  .canva .ctitle{font-family:'Space Mono',monospace;font-size:8pt;letter-spacing:2px;color:var(--green);margin-bottom:8px;}
+  .steps-row{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;}
+  .cstep{text-align:center;}
+  .cstep .num{background:var(--green);color:#fff;font-family:'Permanent Marker',cursive;font-size:14pt;width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 5px;}
+  .cstep b{font-size:8.5pt;display:block;margin-bottom:2px;}
+  .cstep p{font-size:7.5pt;color:#555;}
+  .cstep .arrow{color:var(--gold);font-size:14pt;line-height:1;margin-top:6px;}
+
+  /* Worksheet lines */
+  .ws{background:#fff;border:1px solid var(--rule);border-radius:8px;padding:10px 14px;margin-bottom:0.14in;}
+  .ws .wtitle{font-family:'Space Mono',monospace;font-size:7.5pt;letter-spacing:1.5px;color:var(--green);margin-bottom:8px;}
+  .field{margin-bottom:9px;}
+  .field label{font-size:8.5pt;font-weight:700;display:block;margin-bottom:2px;}
+  .field .line{border-bottom:1.5px solid #ccc;height:20px;width:100%;}
+  .field .lines2{height:40px;}
+  .field .lines3{height:60px;}
+  .fields2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .fields3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+  /* Pitch checklist */
+  .checklist{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:0.14in;}
+  .chk{background:#fff;border:1px solid var(--rule);border-radius:6px;padding:7px 10px;display:flex;gap:8px;align-items:flex-start;}
+  .chk .box{width:14px;height:14px;border:2px solid var(--green);border-radius:3px;flex-shrink:0;margin-top:1px;}
+  .chk p{font-size:8.3pt;color:#333;margin:0;}
+
+  /* Note / tip box */
+  .tip{background:var(--cream);border-left:4px solid var(--gold);padding:8px 12px;margin-bottom:0.14in;font-size:8.5pt;}
+  .tip b{color:var(--char);}
+
+  /* Rubric table */
+  table{width:100%;border-collapse:collapse;margin-bottom:0.14in;font-size:8.3pt;}
+  th{background:var(--green);color:#fff;text-align:left;padding:6px 8px;font-family:'Space Mono',monospace;font-size:7pt;letter-spacing:1px;}
+  td{border-bottom:1px solid var(--rule);padding:6px 8px;vertical-align:top;}
+  tr:nth-child(even) td{background:#F6F2E6;}
+
+  /* Footer */
+  footer{background:var(--char);padding:7px 0.45in;display:flex;justify-content:space-between;align-items:center;}
+  footer span{font-family:'Space Mono',monospace;font-size:6.5pt;color:#666;letter-spacing:1px;}
+  footer b{color:var(--gold);}
+  @media print{
+    #savebar{display:none!important;}
+    input,textarea{
+      border-color:#bbb!important;
+      -webkit-print-color-adjust:exact;
+      print-color-adjust:exact;
+      background:#fff!important;
+    }
+    input[type="checkbox"]{
+      width:13px!important;
+      height:13px!important;
+    }
+    body{font-size:9pt;}
+    .wrap{padding:0.18in 0.42in 0.28in;}
+  }
+</style>
+</head>
+<body>
+
+<div id="savebar" style="background:#3B6D11;color:#fff;font-family:'Space Mono',monospace;font-size:9.5pt;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;">
+  <span style="color:#EF9F27;font-size:11pt;font-weight:700;letter-spacing:1px;">YOUR THEME · STUDENT GUIDE</span>
+  <span style="font-size:8pt;color:#c8e6c0;flex:1;min-width:200px;">Fill in every section below, then click Save when done.</span>
+  <button onclick="savePDF()" style="background:#EF9F27;color:#2C2C2A;border:none;border-radius:20px;padding:8px 24px;font-family:'Space Mono',monospace;font-size:9pt;font-weight:700;cursor:pointer;letter-spacing:1px;white-space:nowrap;">▼ SAVE AS PDF</button>
+  <button onclick="clearAll()" style="background:transparent;color:#c8e6c0;border:1px solid #c8e6c0;border-radius:20px;padding:8px 16px;font-family:'Space Mono',monospace;font-size:8pt;cursor:pointer;letter-spacing:1px;white-space:nowrap;">✕ CLEAR ALL</button>
+</div>
+<header>
+  <div class="h-label">
+    <div class="marker">YOUR THEME</div>
+    <div class="sub">YEARBOOK STAFF · STUDENT THEME DEVELOPMENT GUIDE</div>
+  </div>
+  <div class="h-right">
+    <b>HOW TO BUILD A YEARBOOK THEME FROM SCRATCH</b><br>
+    Six steps · from idea to pitch<br>
+    Recommended tool: Canva (free)
+  </div>
+</header>
+<div class="stripebar">
+  <div style="background:#3B6D11"></div><div style="background:#3B6D11"></div>
+  <div style="background:#EF9F27"></div><div style="background:#EF9F27"></div>
+  <div style="background:#F5EFDC"></div><div style="background:#F5EFDC"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- INTRO -->
+  <div class="intro">
+    <div class="marker">?</div>
+    <p>You just spent two days looking through yearbooks. You have ideas. This guide takes those ideas and turns them into a real theme proposal — one you can pitch to the adviser and the class. You don't need to be a designer. You need a strong idea, a clear vision, and the willingness to show your work. <em>The best theme doesn't win because it looks the prettiest. It wins because it makes the most sense for this school, this year.</em></p>
+  </div>
+
+  <!-- STEP 1: START WITH AN IDEA -->
+  <div class="section-head">
+    <div class="step">1</div>
+    <h2>Start with a real idea — not a title</h2>
+    <span class="tag">BRAINSTORM</span>
+  </div>
+  <p>Before you think about fonts or colors, you need a concept — one sentence that says what this book is <em>about</em>. Not "our school" or "our year" — that's every yearbook. What is the angle? What is the lens?</p>
+  <p>Three places strong themes come from:</p>
+  <div class="cards">
+    <div class="card">
+      <div class="label">SOURCE 1</div>
+      <b>Something universal</b>
+      <p>An idea everyone relates to — music, movies, seasons, a journey, a game, a chapter. The trick is making it specific to <em>this</em> school and year, not generic.</p>
+    </div>
+    <div class="card">
+      <div class="label">SOURCE 2</div>
+      <b>Something happening right now</b>
+      <p>A cultural moment, a technology, a phrase your generation uses, something unique about this year that future students will look back on and recognize.</p>
+    </div>
+    <div class="card">
+      <div class="label">SOURCE 3</div>
+      <b>Something about this school specifically</b>
+      <p>A milestone, a tradition, an anniversary, the mascot, the neighborhood, the history of the building. The more local, the more powerful.</p>
+    </div>
+  </div>
+  <div class="ws">
+    <div class="wtitle">WORKSHEET A · MY CONCEPT</div>
+    <div class="field"><label>My theme idea in one sentence (what is the book about?):</label><textarea rows="2" style="width:100%;border:1px solid #ccc;border-radius:4px;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:4px 6px;margin-top:2px;resize:vertical;outline:none;color:#2C2C2A;"></textarea></div>
+    <div class="fields2">
+      <div class="field"><label>Where did this idea come from?</label><textarea rows="2" style="width:100%;border:1px solid #ccc;border-radius:4px;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:4px 6px;margin-top:2px;resize:vertical;outline:none;color:#2C2C2A;"></textarea></div>
+      <div class="field"><label>Why does it fit this school and this year?</label><textarea rows="2" style="width:100%;border:1px solid #ccc;border-radius:4px;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:4px 6px;margin-top:2px;resize:vertical;outline:none;color:#2C2C2A;"></textarea></div>
+    </div>
+  </div>
+
+  <!-- STEP 2: TEST THE IDEA -->
+  <div class="section-head">
+    <div class="step">2</div>
+    <h2>Test the idea before you fall in love with it</h2>
+    <span class="tag">CRITICAL THINKING</span>
+  </div>
+  <p>A theme that sounds cool in your head has to survive four tests. Be honest — if it fails one, that's feedback, not failure. Adjust and try again.</p>
+  <div class="tests">
+    <div class="test">
+      <div class="icon">🔍</div>
+      <div><b>The Depth Test</b>
+      <p>List ten things this concept naturally gives you — section names, design elements, special features, language. If you struggle past five, the idea is too thin. Great themes are icebergs.</p></div>
+    </div>
+    <div class="test">
+      <div class="icon">📍</div>
+      <div><b>The Specificity Test</b>
+      <p>Could this exact theme appear in a yearbook from another school? If yes, make it more specific. The best themes could only come from this school, this year.</p></div>
+    </div>
+    <div class="test">
+      <div class="icon">📐</div>
+      <div><b>The Design Test</b>
+      <p>Can a student designer look at the theme and make a layout decision? If the theme doesn't guide real choices — colors, type, photo treatment — it's a title, not a concept.</p></div>
+    </div>
+    <div class="test">
+      <div class="icon">🎯</div>
+      <div><b>The Last Page Test</b>
+      <p>What is the last line of this book? A great theme knows its closing before the first spread is designed. Write the closing line now. If you can't, keep developing.</p></div>
+    </div>
+  </div>
+  <div class="ws">
+    <div class="wtitle">WORKSHEET B · THE FOUR TESTS</div>
+    <div class="field"><label>List 10 things your concept naturally gives you (section names, design ideas, special features, language):</label><textarea rows="3" style="width:100%;border:1px solid #ccc;border-radius:4px;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:4px 6px;margin-top:2px;resize:vertical;outline:none;color:#2C2C2A;"></textarea></div>
+    <div class="fields2">
+      <div class="field"><label>Could this be any school's theme? If yes, how will you make it specific?</label><textarea rows="2" style="width:100%;border:1px solid #ccc;border-radius:4px;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:4px 6px;margin-top:2px;resize:vertical;outline:none;color:#2C2C2A;"></textarea></div>
+      <div class="field"><label>Write the closing line of the book:</label><textarea rows="2" style="width:100%;border:1px solid #ccc;border-radius:4px;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:4px 6px;margin-top:2px;resize:vertical;outline:none;color:#2C2C2A;"></textarea></div>
+    </div>
+  </div>
+
+  <!-- STEP 3: BUILD THE BASICS -->
+  <div class="section-head">
+    <div class="step">3</div>
+    <h2>Build the three basics: palette, type, and sections</h2>
+    <span class="tag">DESIGN FUNDAMENTALS</span>
+  </div>
+  <p>You don't need a finished design — you need to show three decisions. These are the foundation every spread will be built on.</p>
+  <div class="cards">
+    <div class="card">
+      <div class="label">BASIC 1 · COLOR</div>
+      <b>Choose 4–5 colors max</b>
+      <p>Pick a dominant (fills most space), a secondary (type, rules), an accent (highlights, special moments), and a background. Every color must connect to the theme concept — be ready to explain why.</p>
+    </div>
+    <div class="card">
+      <div class="label">BASIC 2 · TYPE</div>
+      <b>Choose 2 typefaces max</b>
+      <p>One for headlines (expressive, on-theme), one for body text (clean, readable). Never use more than two. The headline font should feel like the theme — if you covered the title, the font should still tell you what the book is about.</p>
+    </div>
+    <div class="card">
+      <div class="label">BASIC 3 · SECTIONS</div>
+      <b>Name every section</b>
+      <p>Don't use generic names (Student Life, Sports, Clubs). Name each section using the theme's language. These names become the most visible words in the book — they should surprise and delight.</p>
+    </div>
+  </div>
+  <div class="ws">
+    <div class="wtitle">WORKSHEET C · THE THREE BASICS</div>
+    <div class="fields3">
+      <div class="field"><label>Color 1 (dominant):</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>Color 2 (secondary):</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>Color 3 (accent):</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+    </div>
+    <div class="fields2">
+      <div class="field"><label>Headline typeface + why it fits the theme:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>Body typeface:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+    </div>
+    <div class="fields3">
+      <div class="field"><label>Opening section name:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>Student Life section name:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>Academics section name:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+    </div>
+    <div class="fields3">
+      <div class="field"><label>Sports section name:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>Clubs section name:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+      <div class="field"><label>People section name:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+    </div>
+    <div class="field"><label>Closing section name + the book's last line:</label><input type="text" style="width:100%;border:none;border-bottom:1.5px solid #ccc;background:transparent;font-family:Archivo,sans-serif;font-size:9pt;padding:2px 4px;margin-top:2px;outline:none;color:#2C2C2A;"></div>
+  </div>
+
+  <!-- STEP 4: CANVA -->
+  <div class="section-head">
+    <div class="step">4</div>
+    <h2>Mock it up in Canva (or any tool you choose)</h2>
+    <span class="tag">CANVA RECOMMENDED</span>
+  </div>
+  <p>You don't need a finished product — you need a <em>mood board and a cover concept</em> that show your idea visually. Canva is free, works in any browser, and has everything you need. Other tools — Adobe Express, Google Slides, Photoshop, Illustrator — are all fine. What matters is showing your idea, not what software you used.</p>
+  <div class="canva">
+    <div class="ctitle">CANVA WORKFLOW · FIVE DELIVERABLES TO BUILD</div>
+    <div class="steps-row">
+      <div class="cstep">
+        <div class="num">A</div>
+        <b>Mood board</b>
+        <p>8–12 images, textures, fonts, and color swatches that capture the feel. Use Canva's free image library or upload your own. No text needed — just the visual world of your theme.</p>
+      </div>
+      <div class="cstep">
+        <div class="num">B</div>
+        <b>Color palette</b>
+        <p>Create a simple swatch page: 4–5 color blocks, each labeled with the color's name and its role (dominant, accent, etc.). Use Canva's "Brand Kit" to lock them in.</p>
+      </div>
+      <div class="cstep">
+        <div class="num">C</div>
+        <b>Type sample</b>
+        <p>One page showing your headline font (large, with the theme title) and your body font (a sample paragraph). Show them together so the adviser sees how they work as a pair.</p>
+      </div>
+      <div class="cstep">
+        <div class="num">D</div>
+        <b>Cover concept</b>
+        <p>Design a simple book cover using your palette and fonts. It doesn't have to be perfect — it has to show direction. Think about: what goes on the cover that only this theme could put there?</p>
+      </div>
+      <div class="cstep">
+        <div class="num">E</div>
+        <b>One divider page</b>
+        <p>Design one section divider using the theme's visual language. Include the section's on-theme name. This shows how the concept lives inside the book, not just on the cover.</p>
+      </div>
+    </div>
+  </div>
+  <div class="tip"><b>Canva tip:</b> Start with a blank 8.5 × 11 presentation (not a pre-made template) so your design comes from the theme, not from Canva's defaults. Canva's defaults are fine for presentations — for a yearbook theme pitch, starting blank shows more creative thinking. Use the grid lines and alignment tools to keep things clean.</div>
+
+  <!-- STEP 5: THE PITCH -->
+  <div class="section-head">
+    <div class="step">5</div>
+    <h2>Prepare your pitch</h2>
+    <span class="tag">COMMUNICATION</span>
+  </div>
+  <p>You will present your theme to the class in <b></b> minutes. Your Canva slides are your visual aid — but the pitch is the argument. Hit these four points in order:</p>
+  <div class="cards">
+    <div class="card">
+      <div class="label">PITCH POINT 1</div>
+      <b>The concept</b>
+      <p>Say it in one sentence. What is the book about? Why does that idea belong to this school and this year? Don't explain — state it with confidence.</p>
+    </div>
+    <div class="card">
+      <div class="label">PITCH POINT 2</div>
+      <b>What it gives us</b>
+      <p>Show five things the concept naturally generates: section names, design elements, a special feature, the cover idea, the closing line. The more specific, the stronger the pitch.</p>
+    </div>
+    <div class="card">
+      <div class="label">PITCH POINT 3</div>
+      <b>The visuals</b>
+      <p>Walk through your five Canva deliverables. Don't read them — point to what matters and explain one decision on each: "I chose this color because…" "This font feels like the theme because…"</p>
+    </div>
+    <div class="card">
+      <div class="label">PITCH POINT 4</div>
+      <b>Why it works for us</b>
+      <p>Close with why this theme fits the students, the community, and the year. Be specific about your school. This is the part only you can say — the adviser and the class need to hear that you thought about them, not just the concept.</p>
+    </div>
+  </div>
+
+  <!-- PITCH CHECKLIST -->
+  <div class="section-head">
+    <div class="step">6</div>
+    <h2>Check your work before you submit</h2>
+    <span class="tag">SELF-REVIEW</span>
+  </div>
+  <div class="checklist">
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I can say my theme in one clear sentence.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>My theme is specific to this school and this year — not generic.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I have named all seven sections using the theme's language.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I know the closing line of the book.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I have chosen 4–5 colors and can explain why each one fits.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I have chosen 2 typefaces — one expressive, one clean.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>My Canva deliverables include a mood board, palette, type sample, cover, and one divider.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I can list five things my concept naturally gives the book.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>My cover concept could only come from this theme — not a generic layout.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I can explain every design decision in one sentence.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>My pitch is under your allotted time.</p></div>
+    <div class="chk"><input type="checkbox" style="width:14px;height:14px;margin-top:2px;accent-color:#3B6D11;flex-shrink:0;cursor:pointer;"><p>I am ready to answer: "Why does this theme work for our school?"</p></div>
+  </div>
+
+  <!-- RUBRIC -->
+  <div class="section-head" style="margin-top:0.1in;">
+    <div class="step" style="background:var(--gold);color:var(--char);">★</div>
+    <h2>How your theme will be evaluated</h2>
+    <span class="tag">RUBRIC</span>
+  </div>
+  <table>
+    <tr><th>Criterion</th><th>Strong (4)</th><th>Developing (2–3)</th><th>Needs work (0–1)</th></tr>
+    <tr><td><b>Concept clarity</b></td><td>One clear sentence. Specific, defensible angle. Instantly understood.</td><td>Idea is present but vague or could belong to any school.</td><td>No clear concept. Title only, no angle.</td></tr>
+    <tr><td><b>Depth</b></td><td>10+ natural extensions. Rich metaphor. Sustains a full book.</td><td>5–9 extensions. Some forced or unconnected.</td><td>Fewer than 5. Theme can't support a full book.</td></tr>
+    <tr><td><b>Design basics</b></td><td>4–5 colors, 2 fonts, all connected to the concept with clear reasoning.</td><td>Colors and fonts chosen but not explained or only loosely connected.</td><td>Generic choices. No connection to concept.</td></tr>
+    <tr><td><b>Section names</b></td><td>All sections named in the theme's language. Surprising and specific.</td><td>Some sections named. Others left generic.</td><td>No on-theme section names. Generic labels used.</td></tr>
+    <tr><td><b>Visual deliverables</b></td><td>All five Canva pieces. Cover and divider feel like the concept.</td><td>3–4 pieces. Visuals present but not strongly on-theme.</td><td>Fewer than 3 pieces or visuals don't connect to concept.</td></tr>
+    <tr><td><b>Pitch</b></td><td>Confident, specific, hits all four points. Explains why it fits this school.</td><td>Covers the concept but relies too much on slides or is too brief.</td><td>Unclear, generic, or reads directly from notes.</td></tr>
+  </table>
+
+  <div class="tip" style="margin-bottom:0;"><b>Remember:</b> The goal is not a perfect design. The goal is a strong idea, clearly communicated, visually supported. A bold concept with rough visuals beats a polished cover built on a thin idea every time. Show us why this theme is right for our school. The rest is details — and details can always be refined.</div>
+
+</div>
+
+<footer>
+  <span><b>YOUR THEME</b> · YEARBOOK STAFF STUDENT GUIDE · ADVISER: MR. GIBSON · SADDLEBACK HIGH SCHOOL</span>
+  <span>FROM IDEA TO PITCH · SIX STEPS</span>
+</footer>
+
+<script>
+/* ---------- savePDF ----------
+   Converts every input/textarea to its value as a static span,
+   triggers window.print() (which the browser renders as PDF via
+   the "Save as PDF" destination), then restores the live fields.
+   Net result: typed answers are frozen into the printed output.
+*/
+function savePDF() {
+  // Walk every interactive field and swap it for a <span> with the same value
+  const fields = document.querySelectorAll('input[type="text"], textarea');
+  const saved = [];
+  fields.forEach(el => {
+    const span = document.createElement('span');
+    span.textContent = el.value || '';
+    span.dataset.restore = 'true';
+    // Match the field's visual footprint so layout doesn't shift
+    span.style.cssText = [
+      'display:inline-block',
+      'width:100%',
+      'min-height:' + el.offsetHeight + 'px',
+      'font-family:Archivo,sans-serif',
+      'font-size:9pt',
+      'color:#2C2C2A',
+      'padding:2px 4px',
+      'white-space:pre-wrap',
+      'word-break:break-word',
+      'border-bottom:1.5px solid #bbb',
+      'vertical-align:bottom',
+    ].join(';');
+    el.parentNode.insertBefore(span, el);
+    el.style.display = 'none';
+    saved.push({ el, span });
+  });
+
+  // Checkboxes: leave them — browsers print checked state natively
+
+  // Give the DOM a frame to settle, then print
+  setTimeout(() => {
+    window.print();
+    // Restore live fields after print dialog closes
+    setTimeout(() => {
+      saved.forEach(({ el, span }) => {
+        el.style.display = '';
+        span.parentNode.removeChild(span);
+      });
+    }, 800);
+  }, 120);
+}
+
+/* ---------- clearAll ---------- */
+function clearAll() {
+  if (!confirm('Clear all answers and uncheck all boxes? This cannot be undone.')) return;
+  document.querySelectorAll('input[type="text"], textarea').forEach(el => el.value = '');
+  document.querySelectorAll('input[type="checkbox"]').forEach(el => el.checked = false);
+}
+</script>
+
+</body>
+</html>
